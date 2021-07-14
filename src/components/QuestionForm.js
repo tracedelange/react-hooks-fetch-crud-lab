@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
-function QuestionForm(props) {
+ 
+function QuestionForm({handleQuestionSubmission}) {
   const [formData, setFormData] = useState({
     prompt: "",
     answer1: "",
@@ -19,7 +20,40 @@ function QuestionForm(props) {
 
   function handleSubmit(event) {
     event.preventDefault();
-    console.log(formData);
+    // console.log(formData);
+
+    //Submit to JSON server and reset the question list to include this question
+
+    let postObj = {
+
+      method: "POST",
+
+      headers: {
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+          "prompt": formData.prompt,
+          "correctIndex" : formData.correctIndex,
+          "answers": [formData.answer1, formData.answer2, formData.answer3, formData.answer4]
+      })
+    }
+
+    //Submit post, clear out form, append question to question list and trigger rerender of questions
+
+    fetch('http://localhost:3000/questions', postObj)
+    .then(response => response.json())
+    .then(data => handleQuestionSubmission(data))
+
+
+    setFormData({
+
+      answer1 : '',
+      answer2 : '',
+      answer3 : '',
+      answer4 : '',
+      prompt : ''
+
+    })
   }
 
   return (
